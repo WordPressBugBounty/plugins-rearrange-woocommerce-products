@@ -1,0 +1,1 @@
+# plugins-rearrange-woocommerce-products
