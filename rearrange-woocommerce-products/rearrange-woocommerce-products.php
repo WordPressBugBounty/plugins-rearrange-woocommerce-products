@@ -3,7 +3,7 @@
  * Plugin Name: Rearrange Woocommerce Products
  * Plugin URI: https://wordpress.org/plugins/rearrange-woocommerce-products/
  * Description: a WordPress plugin to Rearrange Woocommerce Products listed on the Shop page
- * Version: 4.3.2
+ * Version: 4.3.3
  * Author: Aslam Doctor
  * Author URI: https://aslamdoctor.com/
  * Developer: Aslam Doctor
@@ -13,7 +13,7 @@
  * Requires at least: 6.6
  *
  * WC requires at least: 4.3
- * WC tested up to: 9.8.2
+ * WC tested up to: 9.8.3
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -424,26 +424,28 @@ if ( ! class_exists( 'ReWooProducts' ) ) {
 			}
 
 			if ( $checker ) {
-				$term    = get_queried_object();
-				$term_id = $term->term_id;
-				if ( $term && $term_id ) {
-					$meta_key   = 'rwpp_sortorder_' . $term_id;
-					$meta_query = array(
-						'meta_query' => array(
-							'relation' => 'OR',
-							array(
-								'key'     => $meta_key,
-								'compare' => 'EXISTS',
+				$term = get_queried_object();
+				if ( $term && is_a( $term, 'WP_Term' ) ) {
+					$term_id = $term->term_id;
+					if ( $term_id ) {
+						$meta_key   = 'rwpp_sortorder_' . $term_id;
+						$meta_query = array(
+							'meta_query' => array(
+								'relation' => 'OR',
+								array(
+									'key'     => $meta_key,
+									'compare' => 'EXISTS',
+								),
+								array(
+									'key'     => $meta_key,
+									'compare' => 'NOT EXISTS',
+								),
 							),
-							array(
-								'key'     => $meta_key,
-								'compare' => 'NOT EXISTS',
-							),
-						),
-					);
-					$query->set( 'meta_query', $meta_query );
-					$query->set( 'orderby', 'meta_value_num menu_order title' );
-					$query->set( 'order', 'ASC' );
+						);
+						$query->set( 'meta_query', $meta_query );
+						$query->set( 'orderby', 'meta_value_num menu_order title' );
+						$query->set( 'order', 'ASC' );
+					}
 				}
 			}
 		}
