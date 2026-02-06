@@ -1,107 +1,183 @@
-=== Rearrange Woocommerce Products ===
+=== Rearrange Products for WooCommerce ===
 Contributors: aslamdoctor
 Donate link: https://github.com/sponsors/aslamdoctor
 Tags: woocommerce, product, reorder, rearrange, sort
 Requires at least: 6.6
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4.0
-License: GPLv3 or later License
-URI: http://www.gnu.org/licenses/gpl-3.0.html
-Stable Tag: 4.3.3
+License: GPL-3.0-or-later
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
+Stable Tag: 5.0.9
 
-Boost WooCommerce sales with the Rearrange WooCommerce Products plugin. Easily reorder products with a simple drag-and-drop tool!
+Boost WooCommerce sales with the Rearrange Products for WooCommerce plugin. Easily reorder products with a simple drag-and-drop tool!
 
 == Description ==
 
-Take Full Control of Your WooCommerce Shop Page with Rearrange WooCommerce Products Plugin
+Take Full Control of Your WooCommerce Product Sort-Order
 
-Are you looking for a way to improve your WooCommerce shop page? The Rearrange WooCommerce Products plugin is the ultimate solution for customizing your product sort order. Designed specifically for WooCommerce-powered stores, this plugin empowers you to optimize the browsing experience and showcase your products in the best possible way.
+<strong>Do you want to decide which products appear first in your WooCommerce shop?</strong>
+Rearrange Products for WooCommerce gives you full control over product ordering so you can highlight your best-selling, featured, or new products exactly where you want them.
 
-With intuitive <strong>drag-and-drop</strong> functionality, you can:
+This plugin is built specifically for WooCommerce stores and helps improve both customer experience and store performance.
 
-* Effortlessly reorder products on your WooCommerce shop page.
-* Customize sorting for specific categories or sub-categories.
+With an easy-to-use <strong>drag-and-drop</strong> interface, you can:
 
-== Why Choose Rearrange WooCommerce Products? ==
+* Reorder/Rearrange products on your main Shop page.
+* Set custom product order for specific categories and sub-categories.
+* Manage product display without touching any code.
 
-1. Enhanced User Experience: Help customers find what they need faster by displaying products in the most engaging order.
-2. Improved SEO Performance: Organize products strategically to boost visibility and rankings.
-3. Increased Conversions: Present your best-selling, new, or featured products at the top of the page.
+== Why Choose Rearrange Products for WooCommerce? ==
+
+<strong>1. Better Shopping Experience</strong>
+Help customers find the right products faster by displaying them in a logical and attractive order.
+
+<strong>2. More Visibility for Key Products</strong>
+Promote best-selling, featured, or seasonal products by placing them at the top.
+
+<strong>3. Higher Conversions</strong>
+Showing the right products first can lead to more clicks and increased sales.
 
 == Features ==
 
 * Fully compatible with WooCommerce.
-* Drag-and-drop interface for quick sorting.
-* Custom sorting for categories or individual pages.
-* Lightweight and optimized for fast performance.
+* Simple drag-and-drop product sorting.
+* Custom sorting for categories and sub-categories.
+* Lightweight plugin with fast performance.
+* No coding knowledge required.
 
+Download Rearrange Products for WooCommerce Today!
 
-<strong>Download Rearrange WooCommerce Products Plugin Today!</strong>
-Transform the way customers interact with your WooCommerce store and elevate your eCommerce game. Start reordering your products with ease and unlock the full potential of your shop page.
+Make your WooCommerce store easier to browse and more effective at selling. Start organizing your products the way you want and give your customers a better shopping experience.
 
-** Before using this plugin, ensure that WooCommerce is properly installed and activated on your website. **
+<strong>Note:</strong> WooCommerce must be installed and activated before using this plugin.
 
 == Important Notes ==
 
-1. If you're using a page builder plugin to showcase your products, please be aware that this plugin may not be compatible. We recommend reaching out to the developers of your page builder plugin for further guidance.
-2. It's important to note that once you deactivate or delete the plugin, any rearrangements of all products cannot be reversed as it updates the 'menu_order' of the products.
-3. If you're reordering products by categories, please keep in mind that the rearrangements WILL BE reversed upon deactivating or deleting the plugin.
+1. If you are using a page builder plugin to display your products, this plugin may not work properly with it. We recommend contacting your page builder’s support team to check compatibility and get assistance.
+2. If you deactivate this plugin, any product rearrangements you’ve made will be turned off. You can restore them at any time by reactivating the plugin.
+3. If you delete or uninstall this plugin, all product rearrangements will be permanently removed and cannot be recovered.
 
 == Installation ==
 
-1. Go to your admin area and select Plugins -> Add new from the menu.
-2. Search for "Rearrange Woocommerce Products".
-3. Click install.
-4. Click activate. If woocommrce is not installed or activated then this plugin will also not activate.
-5. Go to Wordpress "Admin > Rearrange Products" and use drag-and-drop functionality to arrange your products.
-6. Click on "Sort by Categories" tab to arrange products by Categories.
+1. Go to your WordPress Admin Dashboard.
+2. Navigate to <strong>Plugins → Add New</strong>.
+2. Search for <strong>“Rearrange Products for WooCommerce.”</strong>
+4. Click <strong>Install</strong>, then <strong>Activate</strong>. If WooCommerce is not installed or activated, this plugin will not activate.
+5. Go to <strong>Admin → Rearrange Products</strong> and reorder products using drag and drop.
+6. Use the <strong>“Sort by Categories”</strong> tab to arrange products by category.
 
 == Frequently Asked Questions ==
 
 = How do I use this plugin? =
 
-Go to Wordpress "Admin > Rearrange Products" and use drag-and-drop functionality to arrange your products.
-Click on "Sort by Categories" tab to arrange products by Categories.
+Go to <strong>Admin → Rearrange Products</strong> and drag and drop products into your preferred order.
+To sort by category, open the “Sort by Categories” tab.
 
-= Can I undo the changes I have made after deactivating or deleting the plugin? =
+= Can I recover my product order after deactivating or deleting the plugin? =
 
-1. Products rearranging CAN NOT be undone after deactivating or deleting the plugin if you are doing sorting on all products. As it directly updates the "menu_order" property of the products.
-2. Products rearranging WILL BE undone after deactivating or deleting the plugin if you are doing sorting on products by categories.
+1. Deactivating the plugin will temporarily disable your custom product order.
+1. Deleting or uninstalling the plugin will permanently remove all product rearrangements, and they cannot be restored.
 
-= Can I also update the sort order of products added using woocommerce shortcode ? =
+= Does this plugin work with WooCommerce shortcodes? =
 
-Yes, you can override the default sort order of the products added using shortcode like this `[product_category category="my-category-slug"]`. To do that Go to "Admin > Rearrange Products > Settings" and enable/check the option that says "All Loops (including shortcodes)".
+Yes. You can override the default sorting of products added via shortcodes such as:
+`[product_category category="my-category-slug"]`
+
+To enable this:
+1. Go to <strong>Admin → Rearrange Products → Settings</strong>
+2. Enable <strong>“All Loops (including shortcodes)”</strong>
 
 == Troubleshooting ==
 
-**If the sort order you changed is not working on your Shop page, please check below is set properly.**
+**If your custom product order is not showing on the Shop page:**
 
-1. Go to Wordpress Admin > Appearance > Customize
-2. Select "Woocommerce" from left and go to "Product Catalogue"
-3. Now here check for "Default Product Sorting".
-4. Make sure it is set to "Default sorting (custom ordering + name)"
+1. Go to <strong>Admin → Appearance → Customize</strong>
+2. Select <strong>WooCommerce → Product Catalogue</strong>
+3. Find <strong>Default Product Sorting</strong>
+4. Set it to <strong>“Default sorting (custom ordering + name)”</strong>
 
-**If you have huge list of product and the plugin is not saving the sort order changes**
+**If you have a large number of products and changes are not saving**
 
-Then it may be issue with PHP configuration done on your server for `memory_limit` and `max_execution_time`.
-Ask your web hosting provider to increase `memory_limit` and `max_execution_time` and try updating sort order after that.
+This may be due to server limits.
+Ask your hosting provider to increase:
 
-This will fix the issue.
+* memory_limit
+* max_execution_time
+
+After updating these settings, try saving the product order again.
 
 == Plugin Demo ==
 
-[youtube https://www.youtube.com/watch?v=3JFmaoYjZyE]
+[youtube https://www.youtube.com/watch?v=kcgVe_1QzJc]
 
 
 == Screenshots ==
 
 1. The plugin at work reordering all products
 2. Ability to select multiple products and sort
-3. You can view product info from same page
-4. Products sorted by Categories for reordering
-5. Shortcut link under Categories section to sort by categories
+3. Products sorted by Categories for reordering
+4. Shortcut link under Categories section to sort by categories
+5. Settings to Apply sorting on Main loop or All loops
 
 == ChangeLog ==
+
+= Version 5.0.9 =
+* Fixed: Product category shortcode sorting issues when "Apply Sorting To" is set to "All Loops"
+* Added: WPML support - Sync product order across language translations for Global sorting
+
+= Version 5.0.8 =
+* Fixed: Plugin sorting no longer affects secondary product queries (widgets, shortcodes, custom blocks) on category pages
+* Fixed: Footer product blocks now display correctly with their configured sorting on category archives
+* Improved: Sorting filters are now properly removed after main query execution
+
+= Version 5.0.7 =
+* Fixed: Products moving to top of list after editing/updating
+* Improved: Product updates now preserve existing sort order in custom table
+* Tested with WooCommerce 10.4.3
+
+= Version 5.0.6 =
+* Fixed: Category sorting page not loading due to URL routing mismatch
+* Fixed: Critical data loss bug where unloaded products lost sort orders during pagination
+* Improved: Removed automatic orphan cleanup that was causing data loss in category-specific sorting
+
+= Version 5.0.5 =
+* Improved: Troubleshooting page with more customer-friendly language and clearer explanations
+* Improved: Updated troubleshooting titles to be more relatable for end users
+* Improved: Added helpful context and guidance for common issues
+* Improved: Simplified technical language in server configuration section
+
+= Version 5.0.4 =
+* Fixed: Missing vendor and build files
+
+= Version 5.0.2 =
+* Major Release: Complete architectural refactor with unified database storage
+* Added: Custom database table `wp_rwpp_product_order` for centralized sort order storage
+* Added: Support for both global and category-specific product sorting
+* Added: Automatic data migration from legacy storage systems (menu_order and postmeta)
+* Added: Confirmation modal for product order changes with undo functionality
+* Added: Load More button for pagination (replaced infinite scroll with manual control)
+* Added: AJAX load more functionality to load products in chunks of 100
+* Added: CSS variables and design tokens for better maintainability and theming
+* Added: New SCSS buttons component file for consistent styling
+* Added: Comprehensive debug logging for troubleshooting load more issues
+* Improved: Database query optimization with indexed JOINs instead of meta_query
+* Improved: COALESCE fallback logic for graceful degradation
+* Improved: Chunked processing for large product datasets
+* Improved: UI redesign with custom category dropdown
+* Improved: Removed inline styles from templates (all styles now in SCSS)
+* Improved: Cleaner HTML markup without redundant success messages
+* Improved: Better separation of concerns between structure and styling
+* Improved: Performance by loading initial products in chunks
+* Enhanced: Performance with production-ready asset optimization
+* Enhanced: User feedback with loading states on Load More button
+* Enhanced: Better UX with explicit load more control instead of auto-scroll
+* Fixed: Category view now includes subcategory products (matching frontend behavior)
+* Fixed: WP_DEBUG reference error in JavaScript by localizing debug flag
+* Fixed: WP_Query namespace issue in AJAX handler
+* Fixed: AJAX action registrations to execute properly
+* Updated: Build system to @wordpress/scripts with modern Sass implementation
+* Refactored: Complete SASS file structure with variables for colors, typography, spacing
+* Tested with WordPress 6.9 and WooCommerce 10.4.2
 
 = Version 4.3.3 =
 * fixed: Attempt to read property “term_id” on null
