@@ -7,7 +7,7 @@ Tested up to: 6.9
 Requires PHP: 7.4.0
 License: GPL-3.0-or-later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-Stable Tag: 5.0.10
+Stable Tag: 5.0.11
 
 Boost WooCommerce sales with the Rearrange Products for WooCommerce plugin. Easily reorder products with a simple drag-and-drop tool!
 
