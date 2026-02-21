@@ -55,6 +55,7 @@ class Plugin {
 		add_action( 'wp_ajax_save_all_order', [ $this, 'save_all_order_handler' ] );
 		add_action( 'wp_ajax_save_all_order_by_category', [ $this, 'save_all_order_by_category_handler' ] );
 		add_action( 'wp_ajax_load_more_products', [ $this, 'load_more_products_handler' ] );
+		add_action( 'wp_ajax_rwpp_run_remigration', [ $this, 'run_remigration_handler' ] );
 
 		// Admin-only hooks (conditionally loaded)
 		if ( is_admin() ) {
@@ -633,9 +634,20 @@ class Plugin {
 
 		if ( isset( $this->current_category_id ) && $this->current_category_id > 0 ) {
 			$table_name = Database::get_table_name();
+			$category_id = absint( $this->current_category_id );
+			$meta_key = 'rwpp_sortorder_' . $category_id;
+
 			$join .= " LEFT JOIN {$table_name} AS rwpp_order
 					   ON {$wpdb->posts}.ID = rwpp_order.product_id
-					   AND rwpp_order.category_id = " . absint( $this->current_category_id );
+					   AND rwpp_order.category_id = {$category_id}";
+
+			// Postmeta fallback for failed v5.0.2 migrations.
+			$join .= $wpdb->prepare(
+				" LEFT JOIN {$wpdb->postmeta} AS rwpp_meta
+				   ON {$wpdb->posts}.ID = rwpp_meta.post_id
+				   AND rwpp_meta.meta_key = %s",
+				$meta_key
+			);
 		}
 
 		return $join;
@@ -652,8 +664,8 @@ class Plugin {
 		global $wpdb;
 
 		if ( isset( $this->current_category_id ) && $this->current_category_id > 0 ) {
-			// Use COALESCE to fallback: custom_order -> menu_order -> high number (unsorted)
-			$orderby = "COALESCE(rwpp_order.sort_order, {$wpdb->posts}.menu_order, 9999) ASC, {$wpdb->posts}.post_title ASC";
+			// Fallback chain: custom_table -> postmeta (legacy) -> menu_order -> unsorted.
+			$orderby = "COALESCE(rwpp_order.sort_order, CAST(rwpp_meta.meta_value AS UNSIGNED), {$wpdb->posts}.menu_order, 9999) ASC, {$wpdb->posts}.post_title ASC";
 		}
 
 		return $orderby;
@@ -710,20 +722,21 @@ class Plugin {
 		// Get current menu_order to use as default sort order.
 		$menu_order = isset( $post->menu_order ) ? absint( $post->menu_order ) : 0;
 
-		// Add product to custom table for each category (only if it doesn't exist).
+		// Add product to custom table for each category (only if it doesn't already have an entry).
 		if ( $terms ) {
 			foreach ( $terms as $term ) {
 				// Only add if this product doesn't already have a sort order for this category.
+				// get_sort_order() returns null when no entry exists, 0+ when entry exists.
 				$existing_order = Database::get_sort_order( $post_id, $term->term_id );
-				if ( 0 === $existing_order || null === $existing_order ) {
+				if ( null === $existing_order ) {
 					Database::set_sort_order( $post_id, $term->term_id, $menu_order );
 				}
 			}
 		}
 
-		// Also add global sort order (only if it doesn't exist).
+		// Also add global sort order (only if it doesn't already have an entry).
 		$existing_global_order = Database::get_sort_order( $post_id, 0 );
-		if ( 0 === $existing_global_order || null === $existing_global_order ) {
+		if ( null === $existing_global_order ) {
 			Database::set_sort_order( $post_id, 0, $menu_order );
 		}
 
@@ -874,14 +887,31 @@ class Plugin {
 			$join_callback = function( $join ) use ( &$current_term_id ) {
 				global $wpdb;
 				$table_name = $wpdb->prefix . 'rwpp_product_order';
+				$category_id = absint( $current_term_id );
+				$meta_key = 'rwpp_sortorder_' . $category_id;
+
 				$join .= " LEFT JOIN {$table_name} AS rwpp_order
 						   ON {$wpdb->posts}.ID = rwpp_order.product_id
-						   AND rwpp_order.category_id = " . absint( $current_term_id );
+						   AND rwpp_order.category_id = {$category_id}";
+
+				// Postmeta fallback for failed v5.0.2 migrations.
+				if ( $category_id > 0 ) {
+					$join .= $wpdb->prepare(
+						" LEFT JOIN {$wpdb->postmeta} AS rwpp_meta
+						   ON {$wpdb->posts}.ID = rwpp_meta.post_id
+						   AND rwpp_meta.meta_key = %s",
+						$meta_key
+					);
+				}
+
 				return $join;
 			};
 
-			$orderby_callback = function( $orderby ) {
+			$orderby_callback = function( $orderby ) use ( &$current_term_id ) {
 				global $wpdb;
+				if ( absint( $current_term_id ) > 0 ) {
+					return "COALESCE(rwpp_order.sort_order, CAST(rwpp_meta.meta_value AS UNSIGNED), {$wpdb->posts}.menu_order, 9999) ASC, {$wpdb->posts}.post_title ASC";
+				}
 				return "COALESCE(rwpp_order.sort_order, {$wpdb->posts}.menu_order, 9999) ASC, {$wpdb->posts}.post_title ASC";
 			};
 
@@ -958,5 +988,37 @@ class Plugin {
 			);
 		}
 		die(); // Ensure we always exit after AJAX handler
+	}
+
+	/**
+	 * AJAX handler for re-running migration from Troubleshooting page
+	 */
+	public function run_remigration_handler() {
+		if ( ! $this->has_required_permissions() ) {
+			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'rearrange-woocommerce-products' ) ] );
+		}
+
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'rwpp-ajax-nonce' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'rearrange-woocommerce-products' ) ] );
+		}
+
+		$result = Database::run_remigration();
+
+		if ( $result['success'] ) {
+			wp_send_json_success(
+				[
+					'message'           => __( 'Migration completed successfully.', 'rearrange-woocommerce-products' ),
+					'global_migrated'   => $result['global_migrated'],
+					'category_migrated' => $result['category_migrated'],
+				]
+			);
+		} else {
+			wp_send_json_error(
+				[
+					'message' => __( 'Migration failed.', 'rearrange-woocommerce-products' ),
+					'errors'  => $result['errors'],
+				]
+			);
+		}
 	}
 }

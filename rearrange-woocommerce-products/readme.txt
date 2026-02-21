@@ -7,7 +7,7 @@ Tested up to: 6.9
 Requires PHP: 7.4.0
 License: GPL-3.0-or-later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-Stable Tag: 5.0.9
+Stable Tag: 5.0.10
 
 Boost WooCommerce sales with the Rearrange Products for WooCommerce plugin. Easily reorder products with a simple drag-and-drop tool!
 
@@ -106,6 +106,17 @@ Ask your hosting provider to increase:
 
 After updating these settings, try saving the product order again.
 
+**If category sort orders stopped working after upgrading from v4.x to v5.x**
+
+The v5.0.2 update moved sort data from the old storage format to a new custom table. In some cases this migration may have failed silently, causing category-specific sort orders to appear broken.
+
+After updating to v5.0.10 or later, your category sorting should work automatically (the plugin now falls back to the old data). To fully fix the issue:
+
+1. Go to **Admin → Rearrange Products → Troubleshooting**
+2. Open the **"Re-run Data Migration"** panel
+3. Click **"Re-run Migration"**
+4. Verify the success message shows your migrated record counts
+
 == Plugin Demo ==
 
 [youtube https://www.youtube.com/watch?v=kcgVe_1QzJc]
@@ -120,6 +131,14 @@ After updating these settings, try saving the product order again.
 5. Settings to Apply sorting on Main loop or All loops
 
 == ChangeLog ==
+
+= Version 5.0.10 =
+* Fixed: Product sort order resetting to last position when editing/saving a product at the first position in a category
+* Fixed: `Database::get_sort_order()` now correctly distinguishes between "no entry" (null) and "sort_order = 0" (first position)
+* Fixed: Category-specific sort orders broken for users who upgraded from v4.x due to silent migration failures
+* Fixed: Migration error handling in `Database.php` — `create_table()`, `migrate_data()`, and individual migration methods now properly detect and report failures
+* Added: Postmeta fallback in frontend sorting — category pages now automatically fall back to legacy `rwpp_sortorder_{id}` postmeta data if the custom table is empty
+* Added: "Re-run Migration" button on Troubleshooting page to manually re-populate the custom table from legacy data
 
 = Version 5.0.9 =
 * Fixed: Product category shortcode sorting issues when "Apply Sorting To" is set to "All Loops"

@@ -45,7 +45,8 @@ class Database {
 		$table_name = self::get_table_name();
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+		// Note: dbDelta() requires CREATE TABLE without IF NOT EXISTS for proper parsing.
+		$sql = "CREATE TABLE {$table_name} (
 			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			product_id BIGINT(20) UNSIGNED NOT NULL,
 			category_id BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
@@ -63,6 +64,12 @@ class Database {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
 
+		// Verify table was actually created.
+		if ( ! self::table_exists() ) {
+			Helpers::log( 'Failed to create custom table: ' . $table_name, 'error' );
+			return false;
+		}
+
 		return true;
 	}
 
@@ -76,30 +83,47 @@ class Database {
 
 		$table_name = self::get_table_name();
 		$result = [
-			'success'        => false,
-			'global_migrated' => 0,
+			'success'          => false,
+			'global_migrated'  => 0,
 			'category_migrated' => 0,
-			'errors'         => [],
+			'errors'           => [],
 		];
 
 		try {
-			// Ensure table exists
-			self::create_table();
+			// Ensure table exists.
+			$table_created = self::create_table();
+			if ( ! $table_created ) {
+				$result['errors'][] = 'Failed to create custom table';
+				Helpers::log( 'Migration aborted: table creation failed', 'error' );
+				return $result;
+			}
 			Helpers::log( 'Product order table created/verified', 'info' );
 
-			// Phase 1: Migrate global sorting from menu_order
+			// Phase 1: Migrate global sorting from menu_order.
 			$global_count = self::migrate_global_sorting();
-			$result['global_migrated'] = $global_count;
-			Helpers::log( 'Global sorting migration: ' . $global_count . ' records migrated', 'info' );
+			if ( false === $global_count ) {
+				$result['errors'][] = 'Global sorting migration query failed: ' . $wpdb->last_error;
+				Helpers::log( 'Global sorting migration failed: ' . $wpdb->last_error, 'error' );
+			} else {
+				$result['global_migrated'] = $global_count;
+				Helpers::log( 'Global sorting migration: ' . $global_count . ' records migrated', 'info' );
+			}
 
-			// Phase 2: Migrate category-specific sorting from postmeta
+			// Phase 2: Migrate category-specific sorting from postmeta.
 			$category_count = self::migrate_category_sorting();
-			$result['category_migrated'] = $category_count;
-			Helpers::log( 'Category sorting migration: ' . $category_count . ' records migrated', 'info' );
+			if ( false === $category_count ) {
+				$result['errors'][] = 'Category sorting migration query failed: ' . $wpdb->last_error;
+				Helpers::log( 'Category sorting migration failed: ' . $wpdb->last_error, 'error' );
+			} else {
+				$result['category_migrated'] = $category_count;
+				Helpers::log( 'Category sorting migration: ' . $category_count . ' records migrated', 'info' );
+			}
 
-			$result['success'] = true;
-			Helpers::log( 'Data migration completed successfully', 'info' );
-
+			// Only mark success when there are zero errors.
+			if ( empty( $result['errors'] ) ) {
+				$result['success'] = true;
+				Helpers::log( 'Data migration completed successfully', 'info' );
+			}
 		} catch ( \Exception $e ) {
 			$result['errors'][] = $e->getMessage();
 			Helpers::log( 'Migration error: ' . $e->getMessage(), 'error' );
@@ -119,15 +143,19 @@ class Database {
 		$table_name = self::get_table_name();
 		$posts_table = $wpdb->posts;
 
-		// Insert global sorting (category_id = 0) from menu_order
+		// Insert global sorting (category_id = 0) from menu_order.
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query(
+		$query_result = $wpdb->query(
 			"INSERT INTO {$table_name} (product_id, category_id, sort_order, created_at, updated_at)
 			SELECT ID, 0, menu_order, NOW(), NOW()
 			FROM {$posts_table}
 			WHERE post_type = 'product' AND menu_order > 0
 			ON DUPLICATE KEY UPDATE sort_order = VALUES(sort_order), updated_at = NOW()"
 		);
+
+		if ( false === $query_result ) {
+			return false;
+		}
 
 		return $wpdb->rows_affected;
 	}
@@ -143,11 +171,11 @@ class Database {
 		$table_name = self::get_table_name();
 		$postmeta_table = $wpdb->postmeta;
 
-		// Insert category-specific sorting from postmeta
+		// Insert category-specific sorting from postmeta.
 		// Extract category_id from meta_key (rwpp_sortorder_{category_id})
-		// NOTE: Include sort_order >= 0 to capture all positions including 0 (first position)
+		// NOTE: Include sort_order >= 0 to capture all positions including 0 (first position).
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query(
+		$query_result = $wpdb->query(
 			"INSERT INTO {$table_name} (product_id, category_id, sort_order, created_at, updated_at)
 			SELECT
 				post_id,
@@ -162,6 +190,10 @@ class Database {
 			ON DUPLICATE KEY UPDATE sort_order = VALUES(sort_order), updated_at = NOW()"
 		);
 
+		if ( false === $query_result ) {
+			return false;
+		}
+
 		return $wpdb->rows_affected;
 	}
 
@@ -171,7 +203,7 @@ class Database {
 	 * @param int $product_id Product ID
 	 * @param int $category_id Category ID (0 for global)
 	 *
-	 * @return int Sort order or 0 if not found
+	 * @return int|null Sort order or null if not found
 	 */
 	public static function get_sort_order( $product_id, $category_id = 0 ) {
 		global $wpdb;
@@ -189,7 +221,7 @@ class Database {
 			)
 		);
 
-		return $result ? (int) $result : 0;
+		return null !== $result ? (int) $result : null;
 	}
 
 	/**
@@ -454,6 +486,37 @@ class Database {
 		);
 
 		return (int) $count;
+	}
+
+	/**
+	 * Re-run migration from scratch
+	 *
+	 * Deletes the version flag, truncates the custom table, and runs full migration.
+	 *
+	 * @return array Migration result
+	 */
+	public static function run_remigration() {
+		global $wpdb;
+
+		// Delete the version flag so migration can run.
+		delete_option( 'rwpp_db_version' );
+
+		// Truncate the custom table.
+		$table_name = self::get_table_name();
+		if ( self::table_exists() ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "TRUNCATE TABLE {$table_name}" );
+		}
+
+		// Run full migration.
+		$result = self::migrate_data();
+
+		// Set version flag on success.
+		if ( $result['success'] ) {
+			Helpers::update_db_version( '1.0.0' );
+		}
+
+		return $result;
 	}
 
 	/**

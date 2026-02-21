@@ -59,7 +59,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 		</div>
 
-		<!-- Panel 3: General tips -->
+		<!-- Panel 3: Re-run Migration -->
+		<div class="rwpp-panel">
+			<div class="rwpp-panel__header">
+				<h3 class="rwpp-panel__title">
+					<span class="rwpp-panel__icon">🔄</span>
+					Re-run Data Migration
+				</h3>
+				<span class="rwpp-panel__title-icon dashicons dashicons-arrow-down"></span>
+			</div>
+			<div class="rwpp-panel__content">
+				<p><?php esc_html_e( 'If your category sort orders are not displaying correctly after upgrading from an older version, you can re-run the data migration. This will re-copy your sorting data from the old storage format into the new custom table.', 'rearrange-woocommerce-products' ); ?></p>
+				<p><strong><?php esc_html_e( 'Note:', 'rearrange-woocommerce-products' ); ?></strong> <?php esc_html_e( 'This is safe to run multiple times. It will not delete any existing sort data from the old format.', 'rearrange-woocommerce-products' ); ?></p>
+				<p>
+					<button type="button" id="rwpp-run-remigration" class="button button-primary">
+						<?php esc_html_e( 'Re-run Migration', 'rearrange-woocommerce-products' ); ?>
+					</button>
+					<span class="spinner" id="rwpp-remigration-spinner" style="float: none; visibility: hidden;"></span>
+				</p>
+				<div id="rwpp-remigration-result"></div>
+			</div>
+		</div>
+
+		<!-- Panel 4: General tips -->
 		<div class="rwpp-panel">
 			<div class="rwpp-panel__header">
 				<h3 class="rwpp-panel__title">

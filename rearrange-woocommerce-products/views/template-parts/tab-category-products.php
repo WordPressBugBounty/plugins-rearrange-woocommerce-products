@@ -97,9 +97,20 @@ $rwpp_join_callback = function( $join ) use ( &$rwpp_current_term_id ) {
 		global $wpdb;
 		// Use the Database class to get the correct table name.
 		$table_name = $wpdb->prefix . 'rwpp_product_order';
+		$category_id = absint( $rwpp_current_term_id );
+		$meta_key = 'rwpp_sortorder_' . $category_id;
+
 		$join .= " LEFT JOIN {$table_name} AS rwpp_order
 				   ON {$wpdb->posts}.ID = rwpp_order.product_id
-				   AND rwpp_order.category_id = " . absint( $rwpp_current_term_id );
+				   AND rwpp_order.category_id = {$category_id}";
+
+		// Postmeta fallback for failed v5.0.2 migrations.
+		$join .= $wpdb->prepare(
+			" LEFT JOIN {$wpdb->postmeta} AS rwpp_meta
+			   ON {$wpdb->posts}.ID = rwpp_meta.post_id
+			   AND rwpp_meta.meta_key = %s",
+			$meta_key
+		);
 	}
 	return $join;
 };
@@ -107,7 +118,8 @@ $rwpp_join_callback = function( $join ) use ( &$rwpp_current_term_id ) {
 $rwpp_orderby_callback = function( $orderby ) use ( &$rwpp_current_term_id ) {
 	if ( $rwpp_current_term_id > 0 ) {
 		global $wpdb;
-		return "COALESCE(rwpp_order.sort_order, {$wpdb->posts}.menu_order, 9999) ASC, {$wpdb->posts}.post_title ASC";
+		// Fallback chain: custom_table -> postmeta (legacy) -> menu_order -> unsorted.
+		return "COALESCE(rwpp_order.sort_order, CAST(rwpp_meta.meta_value AS UNSIGNED), {$wpdb->posts}.menu_order, 9999) ASC, {$wpdb->posts}.post_title ASC";
 	}
 	return $orderby;
 };
