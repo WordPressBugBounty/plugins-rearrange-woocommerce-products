@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="rwpp-product-image">
 		<?php echo $product->get_image( 'thumbnail' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</div>
-	
+
 	<div class="rwpp-product-details">
 		<div class="rwpp-product-name"><?php the_title(); ?></div>
 		<div class="rwpp-product-meta">
@@ -27,13 +27,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php else : ?>
 				<span class="rwpp-product-stock outofstock"><?php esc_html_e( 'Outofstock', 'rearrange-woocommerce-products' ); ?></span>
 			<?php endif; ?>
+			<?php if ( 'private' === get_post_status( $post->ID ) ) : ?>
+				<span class="rwpp-product-status private"><?php esc_html_e( 'Private', 'rearrange-woocommerce-products' ); ?></span>
+			<?php endif; ?>
 		</div>
 	</div>
-	
+
 	<div class="rwpp-product-price">
 		<?php echo $product->get_price_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</div>
-	
+
 	<div class="rwpp-product-actions">
 		<button class="rwpp-action-btn move-top" title="<?php esc_attr_e( 'Move to top', 'rearrange-woocommerce-products' ); ?>">
 			<span class="dashicons dashicons-arrow-up-alt"></span>
@@ -47,10 +50,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<button class="rwpp-action-btn move-bottom" title="<?php esc_attr_e( 'Move to bottom', 'rearrange-woocommerce-products' ); ?>">
 			<span class="dashicons dashicons-arrow-down-alt"></span>
 		</button>
-		<a href="<?php the_permalink(); ?>" class="rwpp-btn-view" target="_blank" title="<?php esc_attr_e( 'View', 'rearrange-woocommerce-products' ); ?>">
+		<a href="<?php the_permalink(); ?>" class="button button-secondary" target="_blank" title="<?php esc_attr_e( 'View', 'rearrange-woocommerce-products' ); ?>">
 			<span class="dashicons dashicons-visibility"></span> <?php esc_html_e( 'View', 'rearrange-woocommerce-products' ); ?>
 		</a>
-		<a href="<?php echo esc_url( get_edit_post_link() ); ?>" class="rwpp-btn-edit" target="_blank" title="<?php esc_attr_e( 'Edit', 'rearrange-woocommerce-products' ); ?>">
+		<a href="<?php echo esc_url( get_edit_post_link() ); ?>" class="button button-secondary" target="_blank" title="<?php esc_attr_e( 'Edit', 'rearrange-woocommerce-products' ); ?>">
 			<span class="dashicons dashicons-edit"></span> <?php esc_html_e( 'Edit', 'rearrange-woocommerce-products' ); ?>
 		</a>
 	</div>

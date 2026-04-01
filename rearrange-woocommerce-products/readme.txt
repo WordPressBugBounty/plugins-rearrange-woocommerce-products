@@ -7,7 +7,7 @@ Tested up to: 6.9
 Requires PHP: 7.4.0
 License: GPL-3.0-or-later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-Stable Tag: 5.0.11
+Stable Tag: 6.0.0
 
 Boost WooCommerce sales with the Rearrange Products for WooCommerce plugin. Easily reorder products with a simple drag-and-drop tool!
 
@@ -24,28 +24,71 @@ With an easy-to-use <strong>drag-and-drop</strong> interface, you can:
 
 * Reorder/Rearrange products on your main Shop page.
 * Set custom product order for specific categories and sub-categories.
+* Select multiple products at once and move them together.
 * Manage product display without touching any code.
 
 == Why Choose Rearrange Products for WooCommerce? ==
 
-<strong>1. Better Shopping Experience</strong>
+<strong>1. 🛒 Better Shopping Experience</strong>
 Help customers find the right products faster by displaying them in a logical and attractive order.
 
-<strong>2. More Visibility for Key Products</strong>
+<strong>2. 👀 More Visibility for Key Products</strong>
 Promote best-selling, featured, or seasonal products by placing them at the top.
 
-<strong>3. Higher Conversions</strong>
+<strong>3. 📈 Higher Conversions</strong>
 Showing the right products first can lead to more clicks and increased sales.
 
-== Features ==
+<strong>4. ⚡ Bulk Sort in One Click ([Pro](https://www.rearrangeproducts.com/))</strong>
+Sort all your products at once by best-selling, ratings, price, stock status, and more — no need to drag them one by one.
+
+<strong>5. 💾 Never Lose Your Work ([Pro](https://www.rearrangeproducts.com/))</strong>
+Save your product arrangements as reusable presets. Switch between different layouts instantly — perfect for seasonal promotions and A/B testing.
+
+== Free Features ==
 
 * Fully compatible with WooCommerce.
 * Simple drag-and-drop product sorting.
+* Multi-select products and move them together.
 * Custom sorting for categories and sub-categories.
+* Works with WooCommerce shortcodes.
 * Lightweight plugin with fast performance.
 * No coding knowledge required.
 
-Download Rearrange Products for WooCommerce Today!
+== Pro Features ==
+
+Unlock the full power of product management with <strong>[Rearrange Products for WooCommerce Pro](https://www.rearrangeproducts.com/)</strong>:
+
+<strong>⚡ Smart Sort — Bulk Sort Products in One Click</strong>
+Stop dragging products one by one. Smart Sort lets you reorder your entire catalog or a specific category in one shot based on:
+
+* <strong>Best Selling</strong> — Put your top sellers front and center.
+* <strong>Most Rated</strong> — Showcase products with the best reviews.
+* <strong>Price (Low to High / High to Low)</strong> — Organize by price for easy browsing.
+* <strong>In Stock First</strong> — Always show available products at the top.
+* <strong>Latest / Oldest</strong> — Highlight new arrivals or evergreen products.
+* <strong>On Sale</strong> — Push sale items to the top to drive conversions.
+* <strong>Shuffle</strong> — Randomize your product display for a fresh look.
+
+<strong>💾 Sort Presets — Save and Reuse Arrangements</strong>
+Create, save, and switch between different product arrangements effortlessly:
+
+* Save your current product order as a named preset with a description.
+* Apply any saved preset with a single click to instantly rearrange products.
+* Duplicate presets to create variations without starting from scratch.
+* Search and filter through your presets for quick access.
+* Works with both global and category-specific arrangements.
+* Perfect for seasonal layouts, holiday promotions, flash sales, and A/B testing different product orders.
+
+<strong>🔄 Import / Export — Portable Product Arrangements</strong>
+Move your product arrangements between sites or share them with your team:
+
+* Export global, category-specific, or preset arrangements as JSON files.
+* Import arrangements on any site — products are matched by SKU for cross-site compatibility.
+* Migrate your product order when moving to a new domain or staging environment.
+* Detailed import reports showing matched, skipped, and total products.
+* Supports files up to 10MB for large catalogs.
+
+<strong>🚀 [Get Rearrange Products for WooCommerce Pro](https://www.rearrangeproducts.com/)</strong>
 
 Make your WooCommerce store easier to browse and more effective at selling. Start organizing your products the way you want and give your customers a better shopping experience.
 
@@ -53,9 +96,8 @@ Make your WooCommerce store easier to browse and more effective at selling. Star
 
 == Important Notes ==
 
-1. If you are using a page builder plugin to display your products, this plugin may not work properly with it. We recommend contacting your page builder’s support team to check compatibility and get assistance.
-2. If you deactivate this plugin, any product rearrangements you’ve made will be turned off. You can restore them at any time by reactivating the plugin.
-3. If you delete or uninstall this plugin, all product rearrangements will be permanently removed and cannot be recovered.
+1. If you deactivate this plugin, any product rearrangements you've made will be turned off. You can restore them at any time by reactivating the plugin.
+2. If you delete or uninstall this plugin, all product rearrangements will be permanently removed and cannot be recovered.
 
 == Installation ==
 
@@ -81,11 +123,31 @@ To sort by category, open the “Sort by Categories” tab.
 = Does this plugin work with WooCommerce shortcodes? =
 
 Yes. You can override the default sorting of products added via shortcodes such as:
-`[product_category category="my-category-slug"]`
+`[product_category category=”my-category-slug”]`
 
 To enable this:
 1. Go to <strong>Admin → Rearrange Products → Settings</strong>
-2. Enable <strong>“All Loops (including shortcodes)”</strong>
+2. Enable <strong>”All Loops (including shortcodes)”</strong>
+
+= What does the Pro version include? =
+
+The [Pro version](https://www.rearrangeproducts.com/) adds three powerful features:
+
+1. <strong>Smart Sort</strong> — Sort all your products in bulk by best-selling, ratings, price, stock status, sale status, and more with a single click.
+2. <strong>Sort Presets</strong> — Save your product arrangements and switch between them instantly. Great for seasonal promotions and A/B testing.
+3. <strong>Import / Export</strong> — Export your product arrangements as JSON files and import them on another site. Products are matched by SKU for cross-site compatibility.
+
+= Can I try the free version first? =
+
+Absolutely! The free version includes drag-and-drop sorting for all products and categories. You can [upgrade to Pro](https://www.rearrangeproducts.com/) at any time to unlock Smart Sort, Presets, and Import/Export.
+
+= Will I lose my product order if I downgrade from Pro to Free? =
+
+No. Your manually arranged product order (global and category-specific) is preserved. However, Pro features like presets and Smart Sort will no longer be accessible until you [upgrade again](https://www.rearrangeproducts.com/).
+
+= Can I use Import/Export to migrate product order to a new site? =
+
+Yes. The [Import/Export feature (Pro)](https://www.rearrangeproducts.com/) exports your product arrangements as a JSON file. When importing on a different site, products are matched by SKU, so your arrangements transfer even if product IDs differ between sites.
 
 == Troubleshooting ==
 
@@ -106,20 +168,25 @@ Ask your hosting provider to increase:
 
 After updating these settings, try saving the product order again.
 
-**If category sort orders stopped working after upgrading from v4.x to v5.x**
+**If you are using a page builder plugin (Elementor, Divi, WPBakery, etc.)**
 
-The v5.0.2 update moved sort data from the old storage format to a new custom table. In some cases this migration may have failed silently, causing category-specific sort orders to appear broken.
+Page builder plugins often have their own product query settings that work independently of WooCommerce's default sorting.
 
-After updating to v5.0.10 or later, your category sorting should work automatically (the plugin now falls back to the old data). To fully fix the issue:
+To use custom sort order with page builders:
 
-1. Go to **Admin → Rearrange Products → Troubleshooting**
-2. Open the **"Re-run Data Migration"** panel
-3. Click **"Re-run Migration"**
-4. Verify the success message shows your migrated record counts
+1. Check your page builder's product widget/module for sorting options
+2. Look for a "custom order" or "menu order" option in the product display settings
+3. If you need help, contact your page builder's support team for guidance on their specific settings
+
+Note: This plugin works seamlessly with standard WooCommerce shop pages, category pages, and WooCommerce shortcodes.
+
+**Filing a support request?**
+
+Go to <strong>Admin → Rearrange Products → Troubleshooting</strong> and open the <strong>"System Status / Diagnostic Info"</strong> section. Click <strong>"Copy to Clipboard"</strong> and paste the information into your support ticket. This helps us diagnose issues much faster.
 
 == Plugin Demo ==
 
-[youtube https://www.youtube.com/watch?v=kcgVe_1QzJc]
+[youtube https://www.youtube.com/watch?v=ZZS-jXK_GJE]
 
 
 == Screenshots ==
@@ -129,8 +196,53 @@ After updating to v5.0.10 or later, your category sorting should work automatica
 3. Products sorted by Categories for reordering
 4. Shortcut link under Categories section to sort by categories
 5. Settings to Apply sorting on Main loop or All loops
+6. Smart Sort — Automatically sort products by various criteria (Pro)
+7. Sort Presets — Save and manage product arrangements (Pro)
+8. Import / Export — Transfer product arrangements between sites (Pro)
 
 == ChangeLog ==
+
+= Version 6.0.0 =
+
+**New Features**
+* Added: Show private products in admin rearrange UI
+* Added: System status / diagnostic info section on Troubleshooting page for easier support requests
+* Added: Custom admin menu icon
+* Added: Page navigation controls for large product catalogs
+* Added: Auto-scroll when moving products to top or bottom of the list
+* Added: Smooth FLIP animations for product move buttons
+* Added: Empty state UI with guidance for Sort by Products tab
+* Added: Product selection counter showing how many products are selected
+* Added: Automatic cleanup of sort order data when products are deleted
+* Added: Freemius SDK integration for licensing and premium feature management
+
+**Enhancements**
+* Improved: Refactored JavaScript into modular ES6 architecture for better maintainability
+* Improved: Custom RWPP Modal component replacing third-party MicroModal library
+* Improved: Updated branding and plugin display name to "Rearrange Products for WooCommerce"
+* Improved: UI redesign with modern styling, CSS variables, and semantic color system
+* Improved: Button consistency and visual hierarchy across all admin pages
+* Improved: Reorder buttons now disabled based on product position (first/last)
+* Improved: Page builder compatibility notes added to Troubleshooting page
+
+**Bug Fixes**
+* Fixed: Conflict with Post Types Order plugin by bumping filter priority
+* Fixed: Postmeta fallback for category sorting and re-migration support
+* Fixed: Filter bleed-through between multiple WooCommerce shortcodes on the same page
+* Fixed: WooCommerce shortcode caching returning stale results for custom sorting
+* Fixed: Sorting no longer affects secondary queries (widgets, shortcodes, custom blocks) on category pages
+* Fixed: Category-specific sort order on category pages when "All Loops" is enabled
+* Fixed: Nested category dropdown overflow in admin UI
+* Fixed: Layout shift when modals open and close
+* Fixed: Label hyphenation in Safari admin sidebar
+* Fixed: Unbalanced left/right spacing in admin UI
+* Fixed: Modal accessibility issues including aria-hidden warnings
+
+**Compatibility**
+* Tested with WordPress 6.9.1 and WooCommerce 10.6.1
+
+= Version 5.0.11 =
+* Exclude docs folder from plugin distribution
 
 = Version 5.0.10 =
 * Fixed: Product sort order resetting to last position when editing/saving a product at the first position in a category

@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Rearrange Products for WooCommerce
  * Plugin URI: https://wordpress.org/plugins/rearrange-woocommerce-products/
- * Description: A WordPress plugin to rearrange WooCommerce products listed on the Shop page with drag-and-drop functionality.
- * Version: 5.0.11
+ * Description: A WordPress plugin to rearrange Products for WooCommerce listed on the Shop page with drag-and-drop functionality.
+ * Version: 6.0.0
  * Requires at least: 6.6
  * Requires PHP: 7.4.0
  * Author: Aslam Doctor
@@ -14,7 +14,7 @@
  * Domain Path: /languages
  *
  * WC requires at least: 4.3
- * WC tested up to: 10.4.3
+ * WC tested up to: 10.6.1
  *
  * @package ReWooProducts
  */
@@ -54,29 +54,99 @@ if ( ! defined( 'RWPP_BASENAME' ) ) {
 }
 
 /**
- * Load Composer autoloader
+ * Freemius auto-deactivation mechanism.
+ * This allows the SDK to automatically deactivate the free version when the premium version is activated.
  */
-if ( file_exists( RWPP_LOCATION . '/vendor/autoload.php' ) ) {
-	require_once RWPP_LOCATION . '/vendor/autoload.php';
-}
-
-/**
- * Initialize the plugin
- */
-if ( ! function_exists( 'rwpp_init_plugin' ) ) {
+if ( function_exists( 'rwpp_fs' ) ) {
+	// Another version of the plugin is already active.
+	// Register this file's basename so Freemius can handle auto-deactivation.
+	rwpp_fs()->set_basename( false, __FILE__ );
+} else {
 	/**
-	 * Initialize plugin
-	 *
-	 * @return void
+	 * DO NOT REMOVE THIS IF, IT IS ESSENTIAL FOR THE
+	 * `function_exists` CALL ABOVE TO PROPERLY WORK.
 	 */
-	function rwpp_init_plugin() {
-		$rwpp_plugin_obj = new \ReWooProducts\Plugin();
+	if ( ! function_exists( 'rwpp_fs' ) ) {
+		/**
+		 * Load Composer autoloader
+		 */
+		if ( file_exists( RWPP_LOCATION . '/vendor/autoload.php' ) ) {
+			require_once RWPP_LOCATION . '/vendor/autoload.php';
+		}
+
+		/**
+		 * Manually include premium-only class files (not PSR-4 compliant due to __premium_only suffix)
+		 * Freemius will strip these files from free version builds
+		 */
+		if ( file_exists( RWPP_LOCATION . '/includes/SortPresets__premium_only.php' ) ) {
+			require_once RWPP_LOCATION . '/includes/SortPresets__premium_only.php';
+		}
+
+		if ( file_exists( RWPP_LOCATION . '/includes/ImportExport__premium_only.php' ) ) {
+			require_once RWPP_LOCATION . '/includes/ImportExport__premium_only.php';
+		}
+
+		/**
+		 * Initialize Freemius SDK
+		 */
+		if ( file_exists( RWPP_LOCATION . '/includes/freemius-init.php' ) ) {
+			require_once RWPP_LOCATION . '/includes/freemius-init.php';
+		}
 	}
-}
 
-rwpp_init_plugin();
+	/**
+	 * Initialize the plugin
+	 */
+	if ( ! function_exists( 'rwpp_init_plugin' ) ) {
+		/**
+		 * Initialize plugin
+		 *
+		 * @return void
+		 */
+		function rwpp_init_plugin() {
+			$rwpp_plugin_obj = new \ReWooProducts\Plugin();
+		}
+	}
 
-// Backward compatibility alias.
-if ( ! class_exists( 'ReWooProducts' ) ) {
-	class_alias( 'ReWooProducts\Plugin', 'ReWooProducts' );
+	rwpp_init_plugin();
+
+	// Backward compatibility alias.
+	if ( ! class_exists( 'ReWooProducts' ) ) {
+		class_alias( 'ReWooProducts\Plugin', 'ReWooProducts' );
+	}
+
+	/**
+	 * Plugin activation hook.
+	 * Creates/updates database tables using dbDelta for safe migrations.
+	 */
+	register_activation_hook(
+		__FILE__,
+		function () {
+			// Create or update presets table.
+			\ReWooProducts\Database::create_presets_table();
+
+			// Update database version.
+			update_option( 'rwpp_db_version', '6.0.0' );
+		}
+	);
+
+	/**
+	 * Check database version and run migrations if needed.
+	 * This ensures the table is created even if plugin is updated (not just activated).
+	 */
+	add_action(
+		'plugins_loaded',
+		function () {
+			$current_db_version  = get_option( 'rwpp_db_version', '0' );
+			$required_db_version = '6.0.0';
+
+			if ( version_compare( $current_db_version, $required_db_version, '<' ) ) {
+				// Create or update presets table.
+				\ReWooProducts\Database::create_presets_table();
+
+				// Update database version.
+				update_option( 'rwpp_db_version', $required_db_version );
+			}
+		}
+	);
 }

@@ -9,5 +9,7 @@ return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'ReWooProducts\\Database' => $baseDir . '/includes/Database.php',
     'ReWooProducts\\Helpers' => $baseDir . '/includes/Helpers.php',
+    'ReWooProducts\\ImportExport' => $baseDir . '/includes/ImportExport__premium_only.php',
     'ReWooProducts\\Plugin' => $baseDir . '/includes/Plugin.php',
+    'ReWooProducts\\SortPresets' => $baseDir . '/includes/SortPresets__premium_only.php',
 );

@@ -4,8 +4,12 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit64a0f0634da25577d78a5b33db6837fa
+class ComposerStaticInit59d63db91915c7a0853fb95d75a4f986
 {
+    public static $files = array (
+        '8d50dc88e56bace65e1e72f6017983ed' => __DIR__ . '/..' . '/freemius/wordpress-sdk/start.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
         'R' => 
         array (
@@ -24,15 +28,17 @@ class ComposerStaticInit64a0f0634da25577d78a5b33db6837fa
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'ReWooProducts\\Database' => __DIR__ . '/../..' . '/includes/Database.php',
         'ReWooProducts\\Helpers' => __DIR__ . '/../..' . '/includes/Helpers.php',
+        'ReWooProducts\\ImportExport' => __DIR__ . '/../..' . '/includes/ImportExport__premium_only.php',
         'ReWooProducts\\Plugin' => __DIR__ . '/../..' . '/includes/Plugin.php',
+        'ReWooProducts\\SortPresets' => __DIR__ . '/../..' . '/includes/SortPresets__premium_only.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit64a0f0634da25577d78a5b33db6837fa::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit64a0f0634da25577d78a5b33db6837fa::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit64a0f0634da25577d78a5b33db6837fa::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit59d63db91915c7a0853fb95d75a4f986::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit59d63db91915c7a0853fb95d75a4f986::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit59d63db91915c7a0853fb95d75a4f986::$classMap;
 
         }, null, ClassLoader::class);
     }
