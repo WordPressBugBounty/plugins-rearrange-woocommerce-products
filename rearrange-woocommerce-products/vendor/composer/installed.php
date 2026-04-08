@@ -3,7 +3,7 @@
         'name' => 'aslamdoctor/rearrange-woocommerce-products',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '541420bfeabfd53713605b405f5e40e218a5d30e',
+        'reference' => '159d862c80b5991a339dce50ba02d2d5dfc8d01f',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'aslamdoctor/rearrange-woocommerce-products' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '541420bfeabfd53713605b405f5e40e218a5d30e',
+            'reference' => '159d862c80b5991a339dce50ba02d2d5dfc8d01f',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

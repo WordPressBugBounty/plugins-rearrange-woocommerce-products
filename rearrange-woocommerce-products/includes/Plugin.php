@@ -1138,14 +1138,14 @@ class Plugin {
             foreach ( $terms as $term ) {
                 // Only add if this product doesn't already have a sort order for this category.
                 $existing_order = Database::get_sort_order( $post_id, $term->term_id );
-                if ( 0 === $existing_order || null === $existing_order ) {
+                if ( null === $existing_order ) {
                     Database::set_sort_order( $post_id, $term->term_id, $menu_order );
                 }
             }
         }
         // Also add global sort order (only if it doesn't exist).
         $existing_global_order = Database::get_sort_order( $post_id, 0 );
-        if ( 0 === $existing_global_order || null === $existing_global_order ) {
+        if ( null === $existing_global_order ) {
             Database::set_sort_order( $post_id, 0, $menu_order );
         }
         // Maintain postmeta for backwards compatibility.

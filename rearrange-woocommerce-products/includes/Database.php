@@ -386,7 +386,7 @@ class Database {
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
-		return $result ? (int) $result : 0;
+		return null !== $result ? (int) $result : null;
 	}
 
 	/**

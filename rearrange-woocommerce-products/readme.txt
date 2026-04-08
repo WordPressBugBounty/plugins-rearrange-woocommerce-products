@@ -7,7 +7,7 @@ Tested up to: 6.9
 Requires PHP: 7.4.0
 License: GPL-3.0-or-later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-Stable Tag: 6.0.0
+Stable Tag: 6.0.1
 
 Boost WooCommerce sales with the Rearrange Products for WooCommerce plugin. Easily reorder products with a simple drag-and-drop tool!
 
@@ -201,6 +201,10 @@ Go to <strong>Admin → Rearrange Products → Troubleshooting</strong> and open
 8. Import / Export — Transfer product arrangements between sites (Pro)
 
 == ChangeLog ==
+
+= Version 6.0.1 =
+* Fixed: Product sort order resetting to last position when editing/saving a product at the first position in a category
+* Fixed: `Database::get_sort_order()` now correctly distinguishes between "no entry" (null) and "sort_order = 0" (first position)
 
 = Version 6.0.0 =
 
