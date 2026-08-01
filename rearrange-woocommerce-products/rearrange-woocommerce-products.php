@@ -3,7 +3,7 @@
  * Plugin Name: Rearrange Products for WooCommerce
  * Plugin URI: https://wordpress.org/plugins/rearrange-woocommerce-products/
  * Description: A WordPress plugin to rearrange Products for WooCommerce listed on the Shop page with drag-and-drop functionality.
- * Version: 6.0.1
+ * Version: 6.0.2
  * Requires at least: 6.6
  * Requires PHP: 7.4.0
  * Author: Aslam Doctor
@@ -14,7 +14,7 @@
  * Domain Path: /languages
  *
  * WC requires at least: 4.3
- * WC tested up to: 10.6.1
+ * WC tested up to: 10.9.4
  *
  * @package ReWooProducts
  */

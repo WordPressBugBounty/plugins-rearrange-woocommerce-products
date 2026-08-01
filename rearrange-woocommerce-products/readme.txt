@@ -3,11 +3,11 @@ Contributors: aslamdoctor
 Donate link: https://github.com/sponsors/aslamdoctor
 Tags: woocommerce, product, reorder, rearrange, sort
 Requires at least: 6.6
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4.0
 License: GPL-3.0-or-later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-Stable Tag: 6.0.1
+Stable Tag: 6.0.2
 
 Boost WooCommerce sales with the Rearrange Products for WooCommerce plugin. Easily reorder products with a simple drag-and-drop tool!
 
@@ -201,6 +201,11 @@ Go to <strong>Admin → Rearrange Products → Troubleshooting</strong> and open
 8. Import / Export — Transfer product arrangements between sites (Pro)
 
 == ChangeLog ==
+
+= Version 6.0.2 =
+* Fixed: Button icons misaligned inside admin buttons on WordPress 7.0 (core now sets line-height/vertical-align on dashicons inside buttons)
+* Updated: Tested up to WordPress 7.0 and WooCommerce 10.9.4
+* Updated: Freemius SDK to 2.13.4
 
 = Version 6.0.1 =
 * Fixed: Product sort order resetting to last position when editing/saving a product at the first position in a category
