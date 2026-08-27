@@ -322,7 +322,7 @@ class Plugin {
         wp_register_script(
             'rwpp_js',
             RWPP_LOCATION_URL . '/build/main.js',
-            array_merge( $asset_file['dependencies'], ['jquery', 'jquery-ui-sortable'] ),
+            array_merge( $asset_file['dependencies'], ['jquery'] ),
             $asset_file['version'],
             true
         );
@@ -1415,7 +1415,7 @@ class Plugin {
                 'post_type'      => ['product'],
                 'posts_per_page' => $per_page,
                 'paged'          => $page,
-                'post_status'    => ['publish'],
+                'post_status'    => ['publish', 'private'],
             ];
             // Add category filter if specified.
             if ( $term_id > 0 ) {

@@ -3,11 +3,11 @@ Contributors: aslamdoctor
 Donate link: https://github.com/sponsors/aslamdoctor
 Tags: woocommerce, product, reorder, rearrange, sort
 Requires at least: 6.6
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4.0
 License: GPL-3.0-or-later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-Stable Tag: 6.0.2
+Stable Tag: 6.0.3
 
 Boost WooCommerce sales with the Rearrange Products for WooCommerce plugin. Easily reorder products with a simple drag-and-drop tool!
 
@@ -201,6 +201,11 @@ Go to <strong>Admin → Rearrange Products → Troubleshooting</strong> and open
 8. Import / Export — Transfer product arrangements between sites (Pro)
 
 == ChangeLog ==
+
+= Version 6.0.3 =
+* Fixed: "Load More" on the rearrange pages excluded private products, causing the loaded list to not match the "Found N products" count and occasionally skip a published product at page boundaries
+* Improved: Removed unused jquery-ui-sortable script dependency (drag-and-drop uses bundled SortableJS), so jQuery UI no longer loads on the plugin admin pages
+* Updated: Tested up to WordPress 7.1 and WooCommerce 11.0.1
 
 = Version 6.0.2 =
 * Fixed: Button icons misaligned inside admin buttons on WordPress 7.0 (core now sets line-height/vertical-align on dashicons inside buttons)
