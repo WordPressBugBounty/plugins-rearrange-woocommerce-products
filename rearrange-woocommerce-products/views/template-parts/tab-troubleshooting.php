@@ -90,6 +90,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</details>
 
+	<?php if ( \ReWooProducts\Database::is_wpml_active() ) : ?>
+	<!-- Issue 5: Resync WPML translations -->
+	<details class="rwpp-accordion">
+		<summary>
+			<span class="dashicons dashicons-translation"></span>
+			<?php esc_html_e( 'Resync Sort Order to WPML Translations', 'rearrange-woocommerce-products' ); ?>
+		</summary>
+		<div class="rwpp-accordion-content">
+			<p><?php esc_html_e( 'Product order is saved in your default WPML language and copied automatically to every translation each time you save. If translated products appear in the wrong order (for example after upgrading from version 6.0.0 to 6.0.3, or after adding a new language), run a full resync.', 'rearrange-woocommerce-products' ); ?></p>
+			<p><?php esc_html_e( 'This copies the current global and category sort orders from your default-language products to all their translations. Default-language products are not changed.', 'rearrange-woocommerce-products' ); ?></p>
+			<p>
+				<button type="button" class="button button-primary" id="rwpp-wpml-resync">
+					<?php esc_html_e( 'Resync Translations', 'rearrange-woocommerce-products' ); ?>
+				</button>
+				<span id="rwpp-wpml-resync-spinner" class="spinner" style="float: none; margin-top: 0;"></span>
+			</p>
+			<div id="rwpp-wpml-resync-result" style="margin-top: 12px;"></div>
+		</div>
+	</details>
+	<?php endif; ?>
+
 	<!-- System Status / Diagnostic Info -->
 	<details class="rwpp-accordion">
 		<summary>

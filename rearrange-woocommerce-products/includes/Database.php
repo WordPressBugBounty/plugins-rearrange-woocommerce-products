@@ -422,6 +422,11 @@ class Database {
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
+		// Sync to WPML translations (one-way: default language -> translations).
+		if ( false !== $result ) {
+			self::sync_orders_to_wpml_translations( [ $sort_order => $product_id ], $category_id );
+		}
+
 		return false !== $result;
 	}
 
@@ -492,6 +497,9 @@ class Database {
 				return false;
 			}
 
+			// Sync to WPML translations (one-way: default language -> translations).
+			self::sync_orders_to_wpml_translations( $sort_orders, $category_id );
+
 			return true;
 
 		} catch ( \Exception $e ) {
@@ -499,6 +507,266 @@ class Database {
 			Helpers::log( 'Exception in bulk_update_orders for category_id: ' . $category_id . ', Error: ' . $e->getMessage(), 'error' );
 			return false;
 		}
+	}
+
+	/**
+	 * Whether WPML is active (detected via its public filter API).
+	 *
+	 * @return bool
+	 */
+	public static function is_wpml_active() {
+		return has_filter( 'wpml_default_language' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+	}
+
+	/**
+	 * WPML sync: copy ordering written in the DEFAULT language to translated products/categories.
+	 * One-way sync (default -> translations). No-op when WPML is not active or when saving
+	 * from a non-default language.
+	 *
+	 * @param array $sort_orders Array of sort_order => product_id mappings.
+	 * @param int   $category_id Category ID (0 for global).
+	 *
+	 * @return void
+	 */
+	private static function sync_orders_to_wpml_translations( $sort_orders, $category_id = 0 ) {
+		if ( ! self::is_wpml_active() ) {
+			return;
+		}
+
+		$default_lang = apply_filters( 'wpml_default_language', null ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+		$current_lang = apply_filters( 'wpml_current_language', null ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+
+		if ( empty( $default_lang ) ) {
+			return;
+		}
+
+		// Only sync when saving from the default language (one-way).
+		if ( ! empty( $current_lang ) && $current_lang !== $default_lang ) {
+			return;
+		}
+
+		$pairs = [];
+		foreach ( $sort_orders as $sort_order => $product_id ) {
+			$pairs[] = [ absint( $product_id ), absint( $sort_order ) ];
+		}
+
+		self::sync_pairs_to_wpml_translations( $pairs, $category_id, $default_lang );
+	}
+
+	/**
+	 * Write the given (product_id, sort_order) pairs to every non-default WPML language.
+	 *
+	 * Unlike sync_orders_to_wpml_translations() this accepts a list of pairs, so duplicate
+	 * sort_order values (possible in data migrated from menu_order) are preserved.
+	 *
+	 * @param array  $pairs        List of [ product_id, sort_order ] pairs (default-language product IDs).
+	 * @param int    $category_id  Category ID (0 for global).
+	 * @param string $default_lang WPML default language code.
+	 *
+	 * @return int Number of translated rows written.
+	 */
+	private static function sync_pairs_to_wpml_translations( $pairs, $category_id, $default_lang ) {
+		$languages = apply_filters( 'wpml_active_languages', null, [ 'skip_missing' => 1 ] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+		if ( empty( $languages ) || ! is_array( $languages ) ) {
+			return 0;
+		}
+
+		global $wpdb;
+		$table_name  = self::get_table_name();
+		$category_id = absint( $category_id );
+		$written     = 0;
+
+		foreach ( $languages as $lang_code => $lang_info ) {
+			if ( $lang_code === $default_lang ) {
+				continue;
+			}
+
+			// Translate the category term id for this language (unless global, category_id = 0).
+			$translated_category_id = 0;
+			if ( $category_id > 0 ) {
+				$translated_category_id = (int) apply_filters( 'wpml_object_id', $category_id, 'product_cat', false, $lang_code ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+				// Category not translated in this language, nothing to sync.
+				if ( $translated_category_id <= 0 ) {
+					continue;
+				}
+			}
+
+			$placeholders = [];
+			$args         = [ $table_name ];
+
+			foreach ( $pairs as $pair ) {
+				$product_id = absint( $pair[0] );
+				$sort_order = absint( $pair[1] );
+
+				if ( $product_id <= 0 ) {
+					continue;
+				}
+
+				$translated_product_id = (int) apply_filters( 'wpml_object_id', $product_id, 'product', false, $lang_code ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+				if ( $translated_product_id <= 0 || $translated_product_id === $product_id ) {
+					// Product not translated in this language.
+					continue;
+				}
+
+				// Only sync WooCommerce native menu_order for GLOBAL sorting (category_id = 0).
+				if ( 0 === $category_id ) {
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$wpdb->update(
+						$wpdb->posts,
+						[ 'menu_order' => $sort_order ],
+						[ 'ID' => $translated_product_id ],
+						[ '%d' ],
+						[ '%d' ]
+					);
+				}
+
+				$placeholders[] = '(%d, %d, %d, NOW(), NOW())';
+				$args[]         = $translated_product_id;
+				$args[]         = $translated_category_id;
+				$args[]         = $sort_order;
+			}
+
+			if ( empty( $placeholders ) ) {
+				continue;
+			}
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->query(
+				$wpdb->prepare(
+					'INSERT INTO %i (product_id, category_id, sort_order, created_at, updated_at)
+					VALUES ' . implode( ',', $placeholders ) . '
+					ON DUPLICATE KEY UPDATE sort_order = VALUES(sort_order), updated_at = NOW()',
+					$args
+				)
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+			$written += count( $placeholders );
+		}
+
+		return $written;
+	}
+
+	/**
+	 * Re-sync every stored sort order (global and per category) to WPML translations.
+	 *
+	 * Used once after upgrading from a version that lacked WPML sync, and on demand from the
+	 * Troubleshooting page. Reads only default-language products as the source of truth, then
+	 * pushes their order to every translation. Runs in the default language regardless of the
+	 * admin language switcher.
+	 *
+	 * @return array {
+	 *     @type bool   $success   Whether the resync ran.
+	 *     @type int    $synced    Translated rows written.
+	 *     @type int    $sources   Default-language rows used as the source.
+	 *     @type int    $languages Non-default languages processed.
+	 *     @type string $message   Reason when not run (e.g. WPML inactive).
+	 * }
+	 */
+	public static function resync_wpml_translations() {
+		$result = [
+			'success'   => false,
+			'synced'    => 0,
+			'sources'   => 0,
+			'languages' => 0,
+			'message'   => '',
+		];
+
+		if ( ! self::is_wpml_active() ) {
+			$result['message'] = 'wpml_inactive';
+			return $result;
+		}
+
+		$default_lang = apply_filters( 'wpml_default_language', null ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+		$current_lang = apply_filters( 'wpml_current_language', null ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+
+		if ( empty( $default_lang ) ) {
+			$result['message'] = 'no_default_language';
+			return $result;
+		}
+
+		$languages = apply_filters( 'wpml_active_languages', null, [ 'skip_missing' => 1 ] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+		if ( ! is_array( $languages ) ) {
+			$languages = [];
+		}
+		$result['languages'] = count( array_diff( array_keys( $languages ), [ $default_lang ] ) );
+
+		if ( 0 === $result['languages'] ) {
+			$result['success'] = true;
+			$result['message'] = 'single_language';
+			return $result;
+		}
+
+		// Force the default language so wpml_object_id resolves from the right side.
+		$switched = ! empty( $current_lang ) && $current_lang !== $default_lang;
+		if ( $switched ) {
+			do_action( 'wpml_switch_language', $default_lang ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+		}
+
+		global $wpdb;
+		$table_name = self::get_table_name();
+		$batch_size = 200;
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$category_ids = $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT category_id FROM %i', $table_name ) );
+
+		foreach ( $category_ids as $category_id ) {
+			$category_id = absint( $category_id );
+
+			// Skip categories that are themselves translations; their default-language
+			// counterpart is processed on its own and will write to them.
+			if ( $category_id > 0 ) {
+				$default_category_id = (int) apply_filters( 'wpml_object_id', $category_id, 'product_cat', false, $default_lang ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+				if ( $default_category_id !== $category_id ) {
+					continue;
+				}
+			}
+
+			$offset = 0;
+			do {
+				$rows = $wpdb->get_results(
+					$wpdb->prepare(
+						'SELECT product_id, sort_order FROM %i WHERE category_id = %d ORDER BY product_id ASC LIMIT %d OFFSET %d',
+						$table_name,
+						$category_id,
+						$batch_size,
+						$offset
+					),
+					ARRAY_A
+				);
+
+				$pairs = [];
+				foreach ( $rows as $row ) {
+					$product_id = absint( $row['product_id'] );
+
+					// Only default-language products are a source of truth.
+					$default_product_id = (int) apply_filters( 'wpml_object_id', $product_id, 'product', false, $default_lang ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+					if ( $default_product_id !== $product_id ) {
+						continue;
+					}
+
+					$pairs[] = [ $product_id, absint( $row['sort_order'] ) ];
+				}
+
+				if ( ! empty( $pairs ) ) {
+					$result['sources'] += count( $pairs );
+					$result['synced']  += self::sync_pairs_to_wpml_translations( $pairs, $category_id, $default_lang );
+				}
+
+				$offset   += $batch_size;
+				$row_count = count( $rows );
+			} while ( $row_count === $batch_size );
+		}
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+		if ( $switched ) {
+			do_action( 'wpml_switch_language', $current_lang ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook, not ours.
+		}
+
+		$result['success'] = true;
+		Helpers::log( sprintf( 'WPML resync: %d source rows -> %d translated rows across %d languages', $result['sources'], $result['synced'], $result['languages'] ), 'info' );
+
+		return $result;
 	}
 
 	/**

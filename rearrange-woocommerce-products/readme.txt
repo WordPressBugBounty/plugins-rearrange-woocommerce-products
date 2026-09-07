@@ -7,7 +7,7 @@ Tested up to: 7.1
 Requires PHP: 7.4.0
 License: GPL-3.0-or-later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-Stable Tag: 6.0.3
+Stable Tag: 6.0.4
 
 Boost WooCommerce sales with the Rearrange Products for WooCommerce plugin. Easily reorder products with a simple drag-and-drop tool!
 
@@ -201,6 +201,11 @@ Go to <strong>Admin → Rearrange Products → Troubleshooting</strong> and open
 8. Import / Export — Transfer product arrangements between sites (Pro)
 
 == ChangeLog ==
+
+= Version 6.0.4 =
+* Fixed: WPML sync of product sort order to translated products was lost during the 6.0.0 merge. Saving a global or category order in the default language now updates the translations again, as it did in 5.0.11
+* Added: One-time automatic resync of existing sort orders to WPML translations after updating to 6.0.4
+* Added: "Resync Sort Order to WPML Translations" tool on the Troubleshooting page (shown only when WPML is active)
 
 = Version 6.0.3 =
 * Fixed: "Load More" on the rearrange pages excluded private products, causing the loaded list to not match the "Found N products" count and occasionally skip a published product at page boundaries

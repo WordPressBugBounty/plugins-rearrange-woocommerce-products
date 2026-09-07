@@ -16,6 +16,11 @@ if ( !defined( 'ABSPATH' ) ) {
  */
 class Plugin {
     /**
+     * Plugin version that (re)introduced WPML sync. Bump to force another one-time resync.
+     */
+    const WPML_RESYNC_VERSION = '6.0.4';
+
+    /**
      * Current category ID for frontend queries
      *
      * @var int
@@ -71,6 +76,11 @@ class Plugin {
         add_action( 'wp_ajax_save_all_order_by_category', [$this, 'save_all_order_by_category_handler'] );
         add_action( 'wp_ajax_load_more_products', [$this, 'load_more_products_handler'] );
         add_action( 'wp_ajax_rwpp_run_remigration', [$this, 'run_remigration_handler'] );
+        add_action( 'wp_ajax_rwpp_wpml_resync', [$this, 'wpml_resync_handler'] );
+        // WPML: one-time resync of translated product order after upgrading from a version without sync.
+        // Runs on init (not plugins_loaded) so WPML has registered its filters.
+        add_action( 'init', [$this, 'maybe_schedule_wpml_resync'], 30 );
+        add_action( 'rwpp_wpml_resync', [$this, 'run_pending_wpml_resync'] );
         // Premium AJAX handlers - Only register if premium methods exist.
         // In free version, these methods are stripped by Freemius build process.
         if ( method_exists( $this, 'smart_sort_products_handler__premium_only' ) ) {
@@ -476,7 +486,92 @@ class Plugin {
      * Callback to add_page
      */
     public function add_pages_callback() {
+        // Fallback for sites where WP-Cron never fired the scheduled resync.
+        $this->run_pending_wpml_resync();
         include RWPP_LOCATION . '/views/rearrange-all-products.php';
+    }
+
+    /**
+     * Schedule a one-time WPML resync when upgrading from a version that lacked WPML sync.
+     *
+     * Versions 6.0.0 to 6.0.3 wrote sort orders only to default-language products, so
+     * translations on those installs are stale. Runs once per site; later installs of WPML
+     * can use the manual button on the Troubleshooting page.
+     *
+     * @return void
+     */
+    public function maybe_schedule_wpml_resync() {
+        $done_version = get_option( 'rwpp_wpml_resync_version', '0' );
+        if ( version_compare( $done_version, self::WPML_RESYNC_VERSION, '>=' ) ) {
+            return;
+        }
+        update_option( 'rwpp_wpml_resync_version', self::WPML_RESYNC_VERSION, false );
+        if ( !Database::is_wpml_active() || !Database::table_exists() ) {
+            return;
+        }
+        update_option( 'rwpp_wpml_resync_pending', 1, false );
+        if ( !wp_next_scheduled( 'rwpp_wpml_resync' ) ) {
+            wp_schedule_single_event( time() + 30, 'rwpp_wpml_resync' );
+        }
+    }
+
+    /**
+     * Run the pending WPML resync (from WP-Cron or the admin page fallback), if flagged.
+     *
+     * @return void
+     */
+    public function run_pending_wpml_resync() {
+        if ( !get_option( 'rwpp_wpml_resync_pending' ) ) {
+            return;
+        }
+        // Clear the flag first so a slow run is not started twice.
+        delete_option( 'rwpp_wpml_resync_pending' );
+        if ( !Database::is_wpml_active() ) {
+            return;
+        }
+        Database::resync_wpml_translations();
+    }
+
+    /**
+     * AJAX: manually resync product order to WPML translations (Troubleshooting page).
+     *
+     * @return void
+     */
+    public function wpml_resync_handler() {
+        if ( !isset( $_POST['nonce'] ) || !wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'rwpp-ajax-nonce' ) ) {
+            wp_send_json_error( [
+                'message' => __( 'Invalid security token.', 'rearrange-woocommerce-products' ),
+            ] );
+        }
+        if ( !$this->has_required_permissions() ) {
+            wp_send_json_error( [
+                'message' => __( 'Insufficient permissions.', 'rearrange-woocommerce-products' ),
+            ] );
+        }
+        if ( !Database::is_wpml_active() ) {
+            wp_send_json_error( [
+                'message' => __( 'WPML is not active on this site.', 'rearrange-woocommerce-products' ),
+            ] );
+        }
+        $result = Database::resync_wpml_translations();
+        if ( !$result['success'] ) {
+            wp_send_json_error( [
+                'message' => __( 'Resync could not run. Please check the error log for details.', 'rearrange-woocommerce-products' ),
+            ] );
+        }
+        if ( 'single_language' === $result['message'] ) {
+            wp_send_json_success( [
+                'message' => __( 'Only one language is configured in WPML, nothing to sync.', 'rearrange-woocommerce-products' ),
+            ] );
+        }
+        wp_send_json_success( [
+            'message' => sprintf( 
+                /* translators: 1: number of translated product rows updated, 2: number of languages */
+                __( 'Resync completed. Updated %1$d translated product orders across %2$d additional language(s).', 'rearrange-woocommerce-products' ),
+                $result['synced'],
+                $result['languages']
+             ),
+        ] );
     }
 
     /**
